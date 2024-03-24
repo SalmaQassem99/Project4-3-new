@@ -12,10 +12,10 @@ const iconsArr = [...arrows, pauseButton];
 const cards = document.querySelectorAll(".game-card .card-wrapper");
 const icons = document.querySelectorAll(`.card-icon`);
 const soundIcons = document.querySelectorAll(".card-icon.sound");
-const recordIcons = document.querySelectorAll(".card-icon.speak");
 const successModal = document.querySelector(".success-wrapper");
-const closeButton = document.querySelector(".closeModal");
-const overlay = document.querySelector(".overlay");
+const flipAudio = document.querySelector("#flip-audio");
+const flipBackAudio = document.querySelector("#flip-back-audio");
+let cardId;
 const animateInfo = () => {
   infoIcon.classList.add("show");
   infoIcon.addEventListener("animationend", () => {
@@ -36,13 +36,22 @@ playButton.addEventListener("click", () => {
   cardWrapper.addEventListener("animationend", () => {
     cardWrapper.classList.remove("hide");
     cardWrapper.style.visibility = "hidden";
-    game.style.backgroundImage = "url('../media/images/gameBackground.svg')";
+    game.style.backgroundImage = `url(${
+      document.querySelector(".game-background").textContent
+    })`;
     body.classList.add("show");
+    pauseButton.style.visibility = "visible";
     document.querySelector(".game-vector").classList.add("show");
     cards.forEach((card) => {
       card.classList.add("show");
     });
   });
+});
+pauseButton.addEventListener("click", () => {
+  const hiddenIcon = pauseButton.querySelector("i.hide");
+  const shownIcon = pauseButton.querySelector("i:not(.hide)");
+  hiddenIcon.classList.remove("hide");
+  shownIcon.classList.add("hide");
 });
 const hideItems = () => {
   iconsArr.forEach((item) => {
@@ -67,24 +76,31 @@ icons.forEach((icon) => {
     }
   });
 });
+flipAudio.addEventListener("ended", () => {
+  document.querySelector(`audio[id="${cardId}"]`).play();
+  const icons = document.querySelectorAll(`.card-icon[data-id="${cardId}"]`);
+  icons.forEach((icon) => {
+    icon.style.visibility = "visible";
+    icon.classList.add("show");
+  });
+});
+flipBackAudio.addEventListener("ended", () => {
+  const icons = document.querySelectorAll(`.card-icon[data-id="${cardId}"]`);
+  icons.forEach((icon) => {
+    icon.classList.add("hide");
+  });
+});
 cards.forEach((card) => {
-  card.addEventListener("click", (e) => {
-    const cardId = card.dataset.id;
-    const icons = document.querySelectorAll(`.card-icon[data-id="${cardId}"]`);
+  card.addEventListener("click", () => {
+    cardId = card.dataset.id;
     if (!card.classList.contains("is-flipped")) {
-      document.querySelector(`audio[id="${cardId}"]`).play();
+      flipAudio.play();
       card.classList.remove("is-flippedBack");
       card.classList.add("is-flipped");
-      icons.forEach((icon) => {
-        icon.style.visibility = "visible";
-        icon.classList.add("show");
-      });
     } else {
+      flipBackAudio.play();
       card.classList.remove("is-flipped");
       card.classList.add("is-flippedBack");
-      icons.forEach((icon) => {
-        icon.classList.add("hide");
-      });
     }
   });
 });
@@ -95,20 +111,6 @@ soundIcons.forEach((icon) => {
     document.querySelector(`audio[id="${id}"]`).play();
     icon.addEventListener("animationend", () => {
       icon.classList.remove("clicked");
-    });
-  });
-});
-recordIcons.forEach((icon) => {
-  icon.addEventListener("click", (e) => {
-    e.preventDefault();
-  });
-  icon.addEventListener("pointerdown", () => {
-    icon.classList.add("animate");
-    icon.addEventListener("pointerup", () => {
-      icon.classList.remove("animate");
-    });
-    icon.addEventListener("pointerout", () => {
-      icon.classList.remove("animate");
     });
   });
 });
@@ -125,31 +127,6 @@ document.querySelector(".show-success").addEventListener("click", () => {
   setTimeout(() => {
     document.querySelector(`audio[id="success"]`).play();
   }, 500);
-});
-successModal.addEventListener("animationend", () => {
-  successModal.classList.remove("show");
-  successModal.classList.remove("hide");
-});
-const addCloseAnimation = () => {
-  closeButton.classList.add("animate");
-  closeButton.addEventListener("animationend", () => {
-    closeButton.classList.remove("animate");
-  });
-  successModal.classList.add("hide");
-  successModal.style.visibility = "hidden";
-  overlay.classList.remove("show");
-};
-document.addEventListener("click", function (event) {
-  const isVisible =
-    window.getComputedStyle(successModal).visibility === "visible";
-  var isClickInside =
-    successModal.contains(event.target) || event.target === closeButton;
-  if (!isClickInside && isVisible) {
-    addCloseAnimation();
-  }
-});
-closeButton.addEventListener("click", () => {
-  addCloseAnimation();
 });
 const checkScreen = () => {
   const isPortrait = window.matchMedia("(orientation: portrait)").matches;

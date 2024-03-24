@@ -128,7 +128,7 @@ a {
   max-height: 3rem;
   aspect-ratio: 1;
   position: relative;
-  z-index: 100;
+  z-index: 1000;
   background: linear-gradient(to bottom, #febf47 2%, #f0b700);
   color: #fff;
   font-size: 1.25rem;
@@ -180,6 +180,10 @@ a {
   top: calc(100vh - 3rem);
   transform: translateY(-100%);
   transition: 0.5s;
+  visibility: hidden;
+}
+.icon.pause .fa-solid.hide {
+  display: none;
 }
 
 .show-success {
@@ -192,14 +196,15 @@ a {
   padding: 1.5rem;
   position: relative;
   overflow-y: auto;
-  visibility: hidden;
-  background-image: url("../media/images/background.svg");
   background-size: cover;
   background-position: 50% 100%;
+  visibility: hidden;
+  transform-origin: left top;
 }
-.game.hide {
-  animation-name: scaleDown;
-  animation-duration: 0.5s;
+.game.hideGame {
+  animation-name: hideGame;
+  animation-timing-function: linear;
+  animation-duration: 0.7s;
   animation-iteration-count: 1;
 }
 .game .head {
@@ -734,6 +739,14 @@ a {
     transform: translateZ(-1px) scaleX(1);
   }
 }
+@keyframes hideGame {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0);
+  }
+}
 @keyframes scaleDown {
   0% {
     top: 50%;
@@ -796,24 +809,24 @@ a {
 }
 @keyframes increase {
   0% {
-    scale: 0;
+    transform: scaleX(0);
   }
   50% {
-    scale: 1.1;
+    transform: scaleX(1.15);
   }
   100% {
-    scale: 1;
+    transform: scaleX(1);
   }
 }
 @keyframes decrease {
   0% {
-    scale: 1;
+    transform: scaleX(1);
   }
   50% {
-    scale: 1.1;
+    transform: scaleX(1.15);
   }
   100% {
-    scale: 0;
+    transform: scaleX(0);
   }
 }
 @keyframes pulse {
